@@ -2,20 +2,39 @@ class MoviesController < ApplicationController
   before_action :set_movie, only: %i[ show edit update destroy ]
 
   # GET /movies or /movies.json
+
   def index
     @all_ratings = Movie.all_ratings
 
+    # Determine which ratings to display.
     if params[:ratings].present?
-      @ratings_to_show = params[:ratings].keys & @all_ratings
-    else
+      @ratings_to_show =
+        params[:ratings].keys & @all_ratings
+
+    elsif params.key?(:commit)
+      # Refresh was clicked with no ratings checked.
       @ratings_to_show = @all_ratings
+
+    else
+      # Restore previously selected ratings.
+      @ratings_to_show =
+        session[:ratings] || @all_ratings
     end
 
+    # Determine how to sort movies.
     allowed_sorts = ['title', 'release_date']
 
-    @sort_by = allowed_sorts.include?(params[:sort_by]) ?
-      params[:sort_by] : 'title'
+    requested_sort =
+      params[:sort_by].presence || session[:sort_by]
 
+    @sort_by = allowed_sorts.include?(requested_sort) ?
+      requested_sort : 'title'
+
+    # Remember the settings for future requests.
+    session[:ratings] = @ratings_to_show
+    session[:sort_by] = @sort_by
+
+    # Retrieve matching movies in the right order.
     @movies = Movie.with_ratings(@ratings_to_show)
                   .order(@sort_by)
   end

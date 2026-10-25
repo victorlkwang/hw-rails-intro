@@ -40,44 +40,29 @@
 
 <% end %>
 
-<table id="movies" class="table">
-  <thead>
-    <tr>
-      <th>
-        <%= link_to "Title",
-            movies_path(
-              sort_by: "title",
-              ratings: @ratings_to_show.index_with("1")
-            ) %>
-      </th>
+<div class="mb-3">
+  Sort by:
+  <%= link_to "Title",
+      movies_path(
+        sort_by: "title",
+        ratings: @ratings_to_show.index_with("1")
+      ) %>
+  |
+  <%= link_to "Release Date",
+      movies_path(
+        sort_by: "release_date",
+        ratings: @ratings_to_show.index_with("1")
+      ) %>
+</div>
 
-      <th>Rating</th>
+<div id="movies">
+  <% @movies.each do |movie| %>
+    <%= render movie %>
 
-      <th>
-        <%= link_to "Release Date",
-            movies_path(
-              sort_by: "release_date",
-              ratings: @ratings_to_show.index_with("1")
-            ) %>
-      </th>
-
-      <th>Details</th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% @movies.each do |movie| %>
-      <tr>
-        <td><%= movie.title %></td>
-        <td><%= movie.rating %></td>
-        <td><%= movie.release_date&.to_date %></td>
-        <td>
-          <%= link_to "Show this movie",
-              movie_path(movie) %>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+    <p>
+      <%= link_to "Show this movie", movie %>
+    </p>
+  <% end %>
+</div>
 
 <%= link_to "New movie", new_movie_path %>
